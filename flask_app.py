@@ -21,6 +21,18 @@ def load_model():
 def home():
     return "✅ College Predictor API is running"
 
+@app.route("/options", methods=["GET"])
+def get_options():
+    model = load_model()
+    colleges = sorted(set(k.split('|')[0] for k in model.keys()))
+    branches = sorted(set(k.split('|')[1] for k in model.keys()))
+    categories = sorted(set(k.split('|')[2] for k in model.keys()))
+    return jsonify({
+        "colleges": colleges,
+        "branches": branches,
+        "categories": categories
+    })
+
 @app.route("/predict", methods=["POST"])
 def predict():
     data = request.get_json()
