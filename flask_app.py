@@ -1,12 +1,23 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import joblib
+import gdown
+import os
 
 app = Flask(__name__)
 CORS(app)
 
-# Load model dictionary
-model = joblib.load("trained_model.joblib")
+# 🔽 Download model from Google Drive if not exists
+file_id = "1Zw_9DvCyTOPC7jshwCqEhWNru4iTmytN"
+url = f"https://drive.google.com/uc?id={file_id}"
+model_path = "trained_model.joblib"
+
+if not os.path.exists(model_path):
+    print("Downloading model from Google Drive...")
+    gdown.download(url, model_path, quiet=False)
+
+# ✅ Load the model dictionary
+model = joblib.load(model_path)
 
 # Root route for browser check
 @app.route("/", methods=["GET"])
@@ -34,7 +45,6 @@ def predict():
     category = data.get("category")
     year = data.get("year", 2024)
 
-    # 🔐 Input validation
     if not (college and branch and category):
         return jsonify({"error": "Missing input fields"}), 400
 
